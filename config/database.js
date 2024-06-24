@@ -13,6 +13,8 @@ db.connect((err) => {
     if (err) {
         console.log('Erreur lors de la connexion à la base de données : ', err)
     } else {
-        console.log('Connection effectué')
+        console.log('Connexion effectué')
     }
 })
+
+module.exports = db;
