@@ -13,4 +13,14 @@ router.post('/articles', async (req, res) => {
     }
 });
 
+// Route pour récupérer tous les articles
+router.get('/articles', async (req,res) => {
+    try {
+        const articles = await articleService.getAllArticles();
+        res.json(articles)
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+})
+
 module.exports = router;
