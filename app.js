@@ -8,13 +8,11 @@ const port = 4000;
 
 // Middleware pour servir des fichiers statiques
 app.use(express.static('public'));
-const corsOptions = {
-    origin: 'http://localhost:5173', // Remplacez par l'URL de votre frontend
-    methods: 'GET,HEAD,OPTIONS,POST,PUT,DELETE',
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  };
-  
-  app.use(cors(corsOptions));
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));  
 
 // Middleware pour analyser les corps de requête JSON
 app.use(express.json());

@@ -1,35 +1,33 @@
 const db = require('../config/database');
-const { ArticleSQL, CategoriesSQL, TagsSQL } = require('./requete/sql');
+const { ArticleSQL, CategoriesSQL, TagsSQL, ViewArticlesSQL, DeleteArticleSQL, UpdateArticleSQL } = require('./requete/sql');
 
 async function createArticle(articleData) {
-    const { user_id, title, content, catagories, tags } = articleData; // Vérifiez si c'est bien 'catagories' ou 'categories'
+    const { user_id, title, content, categories, tags } = articleData;
     const created_at = new Date();
     const updated_at = new Date();
 
     return new Promise((resolve, reject) => {
         const insertArticleQuery = ArticleSQL;
 
-        db.query(insertArticleQuery, [user_id,title, content, created_at, updated_at], (err, result) => {
+        db.query(insertArticleQuery, [title, content, created_at, updated_at], (err, result) => {
             if (err) {
                 return reject(err);
             }
 
             const article_id = result.insertId;
 
-            // Insertion des catégories
-            if (Array.isArray(catagories) && catagories.length > 0) {
+            if (categories && categories.length > 0) {
                 const insertCategoriesQuery = CategoriesSQL;
-                const categroyValues = catagories.map(category_id => [article_id, category_id]);
+                const categoryValues = categories.map(category_id => [article_id, category_id]);
 
-                db.query(insertCategoriesQuery, [categroyValues], (err) => {
+                db.query(insertCategoriesQuery, [categoryValues], (err) => {
                     if (err) {
                         return reject(err);
                     }
                 });
             }
 
-            // Insertion des tags
-            if (Array.isArray(tags) && tags.length > 0) {
+            if (tags && tags.length > 0) {
                 const insertTagsQuery = TagsSQL;
                 const tagValues = tags.map(tag_id => [article_id, tag_id]);
 
@@ -40,14 +38,14 @@ async function createArticle(articleData) {
                 });
             }
 
-            resolve({ article_id, title, content, catagories, tags, created_at, updated_at });
+            resolve({ article_id, title, content, categories, tags, created_at, updated_at });
         });
     });
 }
 
 async function getAllArticles() {
     return new Promise((resolve, reject) => {
-        const query = 'SELECT * FROM Articles';
+        const query = ViewArticlesSQL;
         db.query(query, (err, results) => {
             if (err) {
                 return reject(err);
@@ -57,7 +55,33 @@ async function getAllArticles() {
     });
 }
 
+async function deleteArticles() {
+    return new Promise((resolve, reject) => {
+        const query = DeleteArticleSQL;
+        db.query(query, (err, results) => {
+            if(err){
+                return reject(err)
+            }
+            resolve(results)
+        })
+    })
+}
+
+async function updateArticles(article_id, title, content) {
+    return new Promise((resolve, reject) =>  {
+        const updated_at = UpdateArticleSQL
+        db.query(UpdateArticleSQL, [title, conent, updated_at, article_id], (err, result) => {
+            if(err){
+                return reject(err)
+            }
+            resolve(result)
+        })
+    })
+}
+
 module.exports = {
     createArticle,
-    getAllArticles
+    getAllArticles,
+    deleteArticles,
+    updateArticles
 };

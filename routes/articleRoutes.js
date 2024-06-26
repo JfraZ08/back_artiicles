@@ -23,4 +23,26 @@ router.get('/articles', async (req,res) => {
     }
 })
 
+router.delete('/:id', async (req,res) => {
+    try  {
+        const id = req.params.id;
+        await articleService.deleteArticles(id)
+        res.status(200).send({ message: 'Article supprimé avec succés' })
+    } catch (error) {
+        res.status(500).send({ message: `Erreur lors de la suppression de l'article`, error})
+    }
+})
+
+router.put('/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const {title, content} = req.body;
+        await articleService.updateArticles(id, title, content);
+        res.status(200).send({ message: 'Article mis à jour'});
+    } catch (error) {
+        res.status(500).send({ message: 'Erreur lors de la mise à jour de l\'article', error });
+    }
+});
+
+
 module.exports = router;
