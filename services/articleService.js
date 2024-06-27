@@ -1,31 +1,24 @@
-const pool = require('../config/database'); // Assurez-vous que le chemin vers votre fichier de connexion est correct
+const db = require('../config/database');
+const { ArticleSQL, ViewArticlesSQL, DeleteArticleSQL, UpdateArticleSQL } = require('./requete/sql');
 
-// Fonction pour créer un article
-async function createArticle(article) {
-    const { title, content } = article;
-    const [result] = await pool.query('INSERT INTO articles (title, content) VALUES (?, ?)', [title, content]);
-    return { article_id: result.insertId, title, content };
-}
+exports.createArticle = async (articleData) => {
+  const { title, content, categories, tags, image } = articleData;
+  const [result] = await db.query(ArticleSQL,[title, content, JSON.stringify(categories), JSON.stringify(tags), image, new Date()]);
+  return { id: result.insertId, ...articleData };
+};
 
-// Fonction pour récupérer tous les articles
-async function getAllArticles() {
-    const [rows] = await pool.query('SELECT * FROM articles');
-    return rows;
-}
+exports.getArticles = async () => {
+  const [articles] = await db.query(ViewArticlesSQL);
+  return articles;
+};
 
-// Fonction pour supprimer un article
-async function deleteArticles(id) {
-    await pool.query('DELETE FROM articles WHERE article_id = ?', [id]);
-}
+exports.deleteArticle = async (id) => {
+  await db.query(DeleteArticleSQL, [id]);
+};
 
-// Fonction pour mettre à jour un article
-async function updateArticles(id, title, content) {
-    await pool.query('UPDATE articles SET title = ?, content = ? WHERE article_id = ?', [title, content, id]);
-}
-
-module.exports = {
-    createArticle,
-    getAllArticles,
-    deleteArticles,
-    updateArticles
+exports.updateArticle = async (id, updatedData) => {
+  const { title, content, categories, tags, image } = updatedData;
+  await db.query(
+    UpdateArticleSQL, [title, content, JSON.stringify(categories), JSON.stringify(tags), image, id]);
+  return { id, ...updatedData };
 };
