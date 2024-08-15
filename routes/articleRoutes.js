@@ -1,51 +1,20 @@
 const express = require('express');
-const articleService = require('../services/articleService');
-
 const router = express.Router();
+const articleController = require('../controllers/articlesController')
 
-router.post('/articles', async (req, res) => {
-    try {
-        const article = await articleService.createArticle(req.body);
-        res.status(201).json(article);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// Route pour obtenir tous les articles
+router.get('/', articleController.getAllArticles);
 
-router.get('/articles', async (req, res) => {
-    try {
-        const articles = await articleService.getAllArticles();
-        res.json(articles);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// Route pour obtenir un article par son ID
+router.get('/:id', articleController.getArticleById);
 
-router.get('/articles/:id', async (req, res) => {
-    try {
-        const article = await articleService.getArticleById(req.params.id);
-        res.json(article);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// Route pour créer un nouvel article
+router.post('/', articleController.createArticle);
 
-router.put('/articles/:id', async (req, res) => {
-    try {
-        const article = await articleService.updateArticle(req.params.id, req.body);
-        res.json(article);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// Route pour mettre à jour un article
+router.put('/:id', articleController.updateArticle);
 
-router.delete('/articles/:id', async (req, res) => {
-    try {
-        await articleService.deleteArticle(req.params.id);
-        res.status(204).end();
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// Route pour supprimer un article
+router.delete('/:id', articleController.deleteArticle);
 
 module.exports = router;

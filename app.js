@@ -18,9 +18,22 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
   next();
 });
-// Définir les routes de l'application
-app.use('/api', articleRoutes);
 
+// Utilisation des routes de l'application
+app.use('/api/articles', articleRoutes);
+
+// Erreur de gestion des routes non trouvées
+app.use((req,res) => {
+  res.status(404).json({ message: 'Route non trouvée'});
+})
+
+// Gestion des erreurs
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Erreur interne du serveur' });
+});
+
+// port d'écoute
 app.listen(port, () => {
     console.log(`Serveur backend démarré sur le port ${port}`);
 });
