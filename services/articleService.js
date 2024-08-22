@@ -1,128 +1,79 @@
-// /services/articleService.js
-const db = require('../config/database');
-const {ArticleSQL, ViewArticlesSQL, DeleteArticleSQL, UpdateArticleSQL, CategoriesSQL, TagsSQL, ArticleById, DeleteCategoriesSQL, DeleteTagsSQL} = require('./requete/sql')
+const ArticleRepository = require('./articleRepository');
 
-async function createArticle(articleData) {
-  const { title, content, categories, tags } = articleData;
-  const created_at = new Date();
-  const updated_at = new Date();
+/**
+ * Crée un nouvel article et associe des catégories et des tags.
+ * @param {Object} articleData - Données de l'article à créer.
+ * @param {string} articleData.title - Le titre de l'article.
+ * @param {string} articleData.content - Le contenu de l'article.
+ * @param {Date} articleData.created_at - La date de création de l'article.
+ * @param {Date} articleData.updated_at - La date de la dernière mise à jour de l'article.
+ * @param {Array} articleData.categories - Liste des catégories de l'article.
+ * @param {Array} articleData.tags - Liste des tags de l'article.
+ * @returns {Promise<Object>} - L'article créé avec l'ID généré.
+ */
+exports.createArticle = async (articleData) => {
+  const result = await ArticleRepository.createArticle([
+    articleData.title,
+    articleData.content,
+    articleData.created_at,
+    articleData.updated_at
+  ]);
 
-  return new Promise((resolve, reject) => {
-    db.query(ArticleSQL, [title, content, created_at, updated_at], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      const articleId = result.insertId;
+  await ArticleRepository.createCategories(articleData.categories);
+  await ArticleRepository.createTags(articleData.tags);
 
-      // Gestion des catégories
-      if (categories && categories.length > 0) {
-        const categoryValues = categories.map(categoryId => [articleId, categoryId]);
-        db.query(CategoriesSQL, [categoryValues], (err) => {
-          if (err) {
-            return reject(err);
-          }
-        });
-      }
+  return result;
+};
 
-      // Gestion des tags
-      if (tags && tags.length > 0) {
-        const tagValues = tags.map(tagId => [articleId, tagId]);
-        db.query(TagsSQL, [tagValues], (err) => {
-          if (err) {
-            return reject(err);
-          }
-        });
-      }
+/**
+ * Met à jour un article existant et ses associations de catégories et de tags.
+ * @param {number} id - ID de l'article à mettre à jour.
+ * @param {Object} articleData - Données mises à jour de l'article.
+ * @param {string} articleData.title - Le titre de l'article.
+ * @param {string} articleData.content - Le contenu de l'article.
+ * @param {Array} articleData.categories - Liste des catégories mises à jour.
+ * @param {Array} articleData.tags - Liste des tags mis à jour.
+ * @returns {Promise<void>}
+ */
+exports.updateArticle = async (id, articleData) => {
+  await ArticleRepository.updateArticle([
+    articleData.title,
+    articleData.content,
+    articleData.categories,
+    articleData.tags,
+    id
+  ]);
 
-      resolve({ article_id: articleId, title, content, categories, tags, created_at, updated_at });
-    });
-  });
-}
+  await ArticleRepository.deleteCategories(id);
+  await ArticleRepository.deleteTags(id);
+  await ArticleRepository.createCategories(articleData.categories);
+  await ArticleRepository.createTags(articleData.tags);
+};
 
-async function updateArticle(articleId, articleData) {
-  const { title, content, categories, tags } = articleData;
-  const updated_at = new Date();
+/**
+ * Supprime un article et ses associations de catégories et de tags.
+ * @param {number} id - ID de l'article à supprimer.
+ * @returns {Promise<void>}
+ */
+exports.deleteArticle = async (id) => {
+  await ArticleRepository.deleteCategories(id);
+  await ArticleRepository.deleteTags(id);
+  await ArticleRepository.deleteArticle(id);
+};
 
-  return new Promise((resolve, reject) => {
-    db.query(UpdateArticleSQL, [title, content, updated_at, articleId], (err, results) => {
-      if (err) {
-        return reject(err);
-      }
+/**
+ * Récupère un article par son ID.
+ * @param {number} id - ID de l'article à récupérer.
+ * @returns {Promise<Object|null>} - L'article trouvé ou null si non trouvé.
+ */
+exports.getArticleById = async (id) => {
+  return await ArticleRepository.getArticleById(id);
+};
 
-      // Suppression et réinsertion des catégories
-      db.query(DeleteCategoriesSQL, [articleId], (err) => {
-        if (err) {
-          return reject(err);
-        }
-        if (categories && categories.length > 0) {
-          const categoryValues = categories.map(categoryId => [articleId, categoryId]);
-          db.query(CategoriesSQL, [categoryValues], (err) => {
-            if (err) {
-              return reject(err);
-            }
-          });
-        }
-      });
-
-      // Suppression et réinsertion des tags
-      db.query(DeleteTagsSQL, [articleId], (err) => {
-        if (err) {
-          return reject(err);
-        }
-        if (tags && tags.length > 0) {
-          const tagValues = tags.map(tagId => [articleId, tagId]);
-          db.query(TagsSQL, [tagValues], (err) => {
-            if (err) {
-              return reject(err);
-            }
-          });
-        }
-      });
-
-      resolve({ article_id: articleId, title, content, categories, tags, updated_at });
-    });
-  });
-}
-
-
-async function getAllArticles() {
-  return new Promise((resolve,reject) => {
-    db.query(ViewArticlesSQL, (err,results) => {
-      if(err) {
-        return reject(err);
-      }
-      resolve(results)
-    })
-  })
-}
-
-async function getArticleById(articleId) {
-  return new Promise((resolve, reject) => {
-      const query = ArticleById;
-      db.query(query, [articleId], (err, result) => {
-          if (err) {
-              return reject(err);
-          }
-          resolve(result[0]);
-      });
-  });
-}
-
-async function deleteArticle(articleId) {
-  return new Promise((resolve, reject) => {
-      db.query(DeleteArticleSQL, [articleId], (err, result) => {
-          if (err) {
-              return reject(err);
-          }
-          resolve(result);
-      });
-  });
-}
-
-module.exports = {
-  createArticle,
-  getAllArticles,
-  getArticleById,
-  updateArticle,
-  deleteArticle,
+/**
+ * Récupère tous les articles.
+ * @returns {Promise<Array>} - Liste des articles.
+ */
+exports.getAllArticles = async () => {
+  return await ArticleRepository.getAllArticles();
 };
