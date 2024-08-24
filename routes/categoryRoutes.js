@@ -11,10 +11,10 @@ router.get('/', categoryController.getAllCategories)
 router.get('/:id', categoryController.getCategoryById)
 
 // Route pour créer une nouvelle catégorie
-router.post('/', categoryController.CreateCategory);
+router.post('/', categoryController.createCategory);
 
 // Route pour mettre à jour une catégorie
-router.put('/:id', categoryController.updateCateogry);
+router.put('/:id', categoryController.updateCategory);
 
 // Route pour supprimer une catégorie
 router.delete('/:id', categoryController.deleteCategory);
