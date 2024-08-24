@@ -1,6 +1,8 @@
 const express = require('express');
 // const bodyParser = require('body-parser');
 const articleRoutes = require('./routes/articleRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const tagRoutes = require('./routes/tagRoutes')
 const cors = require('cors')
 const dotenv = require('dotenv')
 dotenv.config();
@@ -21,6 +23,8 @@ app.use((req, res, next) => {
 
 // Utilisation des routes de l'application
 app.use('/api/articles', articleRoutes);
+app.use('/api/category', categoryRoutes);
+app.use('/api/tag', tagRoutes)
 
 // Erreur de gestion des routes non trouvées
 app.use((req,res) => {

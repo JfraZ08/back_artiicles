@@ -1,4 +1,4 @@
-const ArticleService = require('../services/articleService');
+const ArticleService = require('../services/articles/articleService')
 
 // Fonction pour obtenir les articles
 exports.getAllArticles = async (req,res) => {

@@ -1,5 +1,5 @@
 // /src/services/categoryRepository.js
-const db = require('../config/database');
+const db = require('../../config/database')
 const sql = require('../ArticleSql')
 
 /**

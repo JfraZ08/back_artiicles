@@ -1,7 +1,7 @@
 // /src/services/articleRepository.js
 
-const db = require('../config/database');
-const sql = require('./ArticleSql');
+const db = require('../../config/database');
+const sql = require('../ArticleSql');
 
 /**
  * Insère un nouvel article dans la base de données.
