@@ -1,5 +1,5 @@
 // /src/services/tagRepository.js
-const db = require('../config/database');
+const pool = require('../../config/database');
 
 // SQL Queries
 const sql = require('../ArticleSql');
@@ -10,7 +10,7 @@ const sql = require('../ArticleSql');
  */
 exports.getAllTags = async () => {
     try {
-        const [rows] = await db.query(sql.GetAllTagsSQL);
+        const [rows] = await pool.query(sql.GetAllTagsSQL);
         return rows;
     } catch (error) {
         throw new Error('Erreur lors de la récupération des tags: ' + error.message);
@@ -24,7 +24,7 @@ exports.getAllTags = async () => {
  */
 exports.getTagById = async (id) => {
     try {
-        const [rows] = await db.query(sql.GetTagByIdSQL, [id]);
+        const [rows] = await pool.query(sql.GetTagByIdSQL, [id]);
         return rows[0] || null;
     } catch (error) {
         throw new Error('Erreur lors de la récupération du tag: ' + error.message);
@@ -38,7 +38,7 @@ exports.getTagById = async (id) => {
  */
 exports.createTag = async (name) => {
     try {
-        const [result] = await db.query(sql.CreateTagSQL, [name]);
+        const [result] = await pool.query(sql.CreateTagSQL, [name]);
         return { tag_id: result.insertId, name };
     } catch (error) {
         throw new Error('Erreur lors de la création du tag: ' + error.message);
@@ -53,7 +53,7 @@ exports.createTag = async (name) => {
  */
 exports.updateTag = async (id, name) => {
     try {
-        await db.query(sql.UpdateTagSQL, [name, id]);
+        await pool.query(sql.UpdateTagSQL, [name, id]);
     } catch (error) {
         throw new Error('Erreur lors de la mise à jour du tag: ' + error.message);
     }
@@ -66,7 +66,7 @@ exports.updateTag = async (id, name) => {
  */
 exports.deleteTag = async (id) => {
     try {
-        await db.query(sql.DeleteTagSQL, [id]);
+        await pool.query(sql.DeleteTagSQL, [id]);
     } catch (error) {
         throw new Error('Erreur lors de la suppression du tag: ' + error.message);
     }

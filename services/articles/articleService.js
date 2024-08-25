@@ -1,79 +1,67 @@
-const ArticleRepository = require('./articleRepository');
+// back_artiicles/services/articleService.js
 
-/**
- * Crée un nouvel article et associe des catégories et des tags.
- * @param {Object} articleData - Données de l'article à créer.
- * @param {string} articleData.title - Le titre de l'article.
- * @param {string} articleData.content - Le contenu de l'article.
- * @param {Date} articleData.created_at - La date de création de l'article.
- * @param {Date} articleData.updated_at - La date de la dernière mise à jour de l'article.
- * @param {Array} articleData.categories - Liste des catégories de l'article.
- * @param {Array} articleData.tags - Liste des tags de l'article.
- * @returns {Promise<Object>} - L'article créé avec l'ID généré.
- */
-exports.createArticle = async (articleData) => {
-  const result = await ArticleRepository.createArticle([
-    articleData.title,
-    articleData.content,
-    articleData.created_at,
-    articleData.updated_at
-  ]);
+const { ViewArticlesSQL, ArticleById, ArticleSQL, UpdateArticleSQL, DeleteArticleSQL } = require('../ArticleSql');
+const pool = require('../../config/database');
 
-  await ArticleRepository.createCategories(articleData.categories);
-  await ArticleRepository.createTags(articleData.tags);
-
-  return result;
+// Fonction pour obtenir tous les articles
+const getAllArticles = async () => {
+  try {
+    const [rows] = await pool.query(ViewArticlesSQL);
+    return rows;
+  } catch (error) {
+    console.error('Erreur lors de la récupération des articles :', error.message);
+    throw error;
+  }
 };
 
-/**
- * Met à jour un article existant et ses associations de catégories et de tags.
- * @param {number} id - ID de l'article à mettre à jour.
- * @param {Object} articleData - Données mises à jour de l'article.
- * @param {string} articleData.title - Le titre de l'article.
- * @param {string} articleData.content - Le contenu de l'article.
- * @param {Array} articleData.categories - Liste des catégories mises à jour.
- * @param {Array} articleData.tags - Liste des tags mis à jour.
- * @returns {Promise<void>}
- */
-exports.updateArticle = async (id, articleData) => {
-  await ArticleRepository.updateArticle([
-    articleData.title,
-    articleData.content,
-    articleData.categories,
-    articleData.tags,
-    id
-  ]);
-
-  await ArticleRepository.deleteCategories(id);
-  await ArticleRepository.deleteTags(id);
-  await ArticleRepository.createCategories(articleData.categories);
-  await ArticleRepository.createTags(articleData.tags);
+// Fonction pour obtenir un article par ID
+const getArticleById = async (id) => {
+  try {
+    const [rows] = await pool.query(ArticleById, [id]);
+    return rows[0];
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'article :', error.message);
+    throw error;
+  }
 };
 
-/**
- * Supprime un article et ses associations de catégories et de tags.
- * @param {number} id - ID de l'article à supprimer.
- * @returns {Promise<void>}
- */
-exports.deleteArticle = async (id) => {
-  await ArticleRepository.deleteCategories(id);
-  await ArticleRepository.deleteTags(id);
-  await ArticleRepository.deleteArticle(id);
+// Fonction pour ajouter un nouvel article
+const addArticle = async (title, content) => {
+  try {
+    const [result] = await pool.query(ArticleSQL, [title, content]);
+    return result.insertId;
+  } catch (error) {
+    console.error('Erreur lors de l\'ajout de l\'article :', error.message);
+    throw error;
+  }
 };
 
-/**
- * Récupère un article par son ID.
- * @param {number} id - ID de l'article à récupérer.
- * @returns {Promise<Object|null>} - L'article trouvé ou null si non trouvé.
- */
-exports.getArticleById = async (id) => {
-  return await ArticleRepository.getArticleById(id);
+// Fonction pour mettre à jour un article par ID
+const updateArticle = async (id, title, content) => {
+  try {
+    const [result] = await pool.query(UpdateArticleSQL, [title, content, id]);
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l\'article :', error.message);
+    throw error;
+  }
 };
 
-/**
- * Récupère tous les articles.
- * @returns {Promise<Array>} - Liste des articles.
- */
-exports.getAllArticles = async () => {
-  return await ArticleRepository.getAllArticles();
+// Fonction pour supprimer un article par ID
+const deleteArticle = async (id) => {
+  try {
+    const [result] = await pool.query(DeleteArticleSQL, [id]);
+    return result.affectedRows > 0;
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'article :', error.message);
+    throw error;
+  }
+};
+
+module.exports = {
+  getAllArticles,
+  getArticleById,
+  addArticle,
+  updateArticle,
+  deleteArticle
 };

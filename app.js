@@ -23,8 +23,8 @@ app.use((req, res, next) => {
 
 // Utilisation des routes de l'application
 app.use('/api/articles', articleRoutes);
-// app.use('/api/category', categoryRoutes);
-// app.use('/api/tag', tagRoutes)
+app.use('/api/category', categoryRoutes);
+app.use('/api/tag', tagRoutes)
 
 // Erreur de gestion des routes non trouvées
 app.use((req,res) => {

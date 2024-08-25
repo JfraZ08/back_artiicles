@@ -1,10 +1,10 @@
 // /service/ArticleSql.js
 
 // Requêtes pour les articles
-const ArticleSQL = `INSERT INTO pixelrealityV2.Articles (content, created_at, updated_at) VALUES (?, ?, ?)`;
+const ArticleSQL = `INSERT INTO pixelrealityV2.Articles (title,content, created_at, updated_at) VALUES (?, ?, NOW(), NOW())`;
 const ViewArticlesSQL = `SELECT * FROM pixelrealityV2.Articles`;
 const DeleteArticleSQL = `DELETE FROM pixelrealityV2.Articles WHERE article_id = ?`;
-const UpdateArticleSQL = `UPDATE pixelrealityV2.Articles SET content = ?, updated_at = ? WHERE article_id = ?`;
+const UpdateArticleSQL = `UPDATE pixelrealityV2.Articles SET content = ?, updated_at = NOW() WHERE article_id = ?`;
 const ArticleById = `SELECT * FROM pixelrealityV2.Articles WHERE article_id = ?`;
 
 // Requêtes pour les associations article-catégorie

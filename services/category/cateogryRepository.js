@@ -1,5 +1,5 @@
 // /src/services/categoryRepository.js
-const db = require('../../config/database')
+const pool = require('../../config/database')
 const sql = require('../ArticleSql')
 
 /**
@@ -8,7 +8,7 @@ const sql = require('../ArticleSql')
  */
 exports.getAllCategories = async () => {
     try {
-        const [rows] = await db.query(sql.GetAllCategoriesSQL);
+        const [rows] = await pool.query(sql.GetAllCategoriesSQL);
         return rows;
     } catch (error) {
         throw new Error('Erreur lors de la récupération des catégories: ' + error.message);
@@ -22,7 +22,7 @@ exports.getAllCategories = async () => {
  */
 exports.getCategoryById = async (id) => {
     try {
-        const [rows] = await db.query(sql.GetCategoryByIdSQL, [id]);
+        const [rows] = await pool.query(sql.GetCategoryByIdSQL, [id]);
         return rows[0] || null;
     } catch (error) {
         throw new Error('Erreur lors de la récupération de la catégorie: ' + error.message);
@@ -36,7 +36,7 @@ exports.getCategoryById = async (id) => {
  */
 exports.createCategory = async (name) => {
     try {
-        const [result] = await db.query(sql.CreateCategorySQL, [name]);
+        const [result] = await pool.query(sql.CreateCategorySQL, [name]);
         return { category_id: result.insertId, name };
     } catch (error) {
         throw new Error('Erreur lors de la création de la catégorie: ' + error.message);
@@ -51,7 +51,7 @@ exports.createCategory = async (name) => {
  */
 exports.updateCategory = async (id, name) => {
     try {
-        await db.query(sql.UpdateCategorySQL, [name, id]);
+        await pool.query(sql.UpdateCategorySQL, [name, id]);
     } catch (error) {
         throw new Error('Erreur lors de la mise à jour de la catégorie: ' + error.message);
     }
@@ -64,7 +64,7 @@ exports.updateCategory = async (id, name) => {
  */
 exports.deleteCategory = async (id) => {
     try {
-        await db.query(sql.DeleteCategorySQL, [id]);
+        await pool.query(sql.DeleteCategorySQL, [id]);
     } catch (error) {
         throw new Error('Erreur lors de la suppression de la catégorie: ' + error.message);
     }

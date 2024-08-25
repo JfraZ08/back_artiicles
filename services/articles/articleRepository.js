@@ -1,6 +1,6 @@
 // /src/services/articleRepository.js
 
-const db = require('../../config/database');
+const pool = require('../../config/database');
 const sql = require('../ArticleSql');
 
 /**
@@ -10,7 +10,7 @@ const sql = require('../ArticleSql');
  */
 exports.createArticle = async (params) => {
   try {
-    const [result] = await db.query(sql.ArticleSQL, params);
+    const [result] = await pool.query(sql.ArticleSQL, params);
     return { id: result.insertId, ...params };
   } catch (error) {
     throw new Error('Erreur lors de la création de l\'article: ' + error.message);
@@ -24,7 +24,7 @@ exports.createArticle = async (params) => {
  */
 exports.createCategories = async (categories) => {
   try {
-    await db.query(sql.CategoriesSQL, [categories]);
+    await pool.query(sql.CategoriesSQL, [categories]);
   } catch (error) {
     throw new Error('Erreur lors de la création des catégories: ' + error.message);
   }
@@ -37,7 +37,7 @@ exports.createCategories = async (categories) => {
  */
 exports.createTags = async (tags) => {
   try {
-    await db.query(sql.TagsSQL, [tags]);
+    await pool.query(sql.TagsSQL, [tags]);
   } catch (error) {
     throw new Error('Erreur lors de la création des tags: ' + error.message);
   }
@@ -49,7 +49,7 @@ exports.createTags = async (tags) => {
  */
 exports.getAllArticles = async () => {
   try {
-    const [rows] = await db.query(sql.ViewArticlesSQL);
+    const [rows] = await pool.query(sql.ViewArticlesSQL);
     return rows;
   } catch (error) {
     throw new Error('Erreur lors de la récupération des articles: ' + error.message);
@@ -63,7 +63,7 @@ exports.getAllArticles = async () => {
  */
 exports.deleteArticle = async (id) => {
   try {
-    await db.query(sql.DeleteArticleSQL, [id]);
+    await pool.query(sql.DeleteArticleSQL, [id]);
   } catch (error) {
     throw new Error('Erreur lors de la suppression de l\'article: ' + error.message);
   }
@@ -76,7 +76,7 @@ exports.deleteArticle = async (id) => {
  */
 exports.updateArticle = async (params) => {
   try {
-    await db.query(sql.UpdateArticleSQL, params);
+    await pool.query(sql.UpdateArticleSQL, params);
   } catch (error) {
     throw new Error('Erreur lors de la mise à jour de l\'article: ' + error.message);
   }
@@ -89,7 +89,7 @@ exports.updateArticle = async (params) => {
  */
 exports.getArticleById = async (id) => {
   try {
-    const [rows] = await db.query(sql.ArticleById, [id]);
+    const [rows] = await pool.query(sql.ArticleById, [id]);
     return rows[0] || null;
   } catch (error) {
     throw new Error('Erreur lors de la récupération de l\'article: ' + error.message);
@@ -103,7 +103,7 @@ exports.getArticleById = async (id) => {
  */
 exports.deleteCategories = async (id) => {
   try {
-    await db.query(sql.DeleteCategoriesSQL, [id]);
+    await pool.query(sql.DeleteCategoriesSQL, [id]);
   } catch (error) {
     throw new Error('Erreur lors de la suppression des catégories: ' + error.message);
   }
@@ -116,7 +116,7 @@ exports.deleteCategories = async (id) => {
  */
 exports.deleteTags = async (id) => {
   try {
-    await db.query(sql.DeleteTagsSQL, [id]);
+    await pool.query(sql.DeleteTagsSQL, [id]);
   } catch (error) {
     throw new Error('Erreur lors de la suppression des tags: ' + error.message);
   }
