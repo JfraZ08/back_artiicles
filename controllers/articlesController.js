@@ -52,7 +52,7 @@ const getArticleById = async (req, res) => {
     }
   
     try {
-      const updated = await articleService.updateArticle(id, title, content);
+      const updated = await ArticleService.updateArticle(id, title, content);
       if (updated) {
         res.status(200).json({ id, title, content });
       } else {
@@ -69,7 +69,7 @@ const getArticleById = async (req, res) => {
   const deleteArticle = async (req, res) => {
     const { id } = req.params;
     try {
-      const deleted = await articleService.deleteArticle(id);
+      const deleted = await ArticleService.deleteArticle(id);
       if (deleted) {
         res.status(204).send();
       } else {
