@@ -1,8 +1,5 @@
-// /src/services/tagRepository.js
-const pool = require('../../config/database');
-
-// SQL Queries
-const sql = require('../ArticleSql');
+const connectToDatabase = require('../../config/database');
+const { ObjectId } = require('mongodb');
 
 /**
  * Récupère tous les tags.
@@ -10,8 +7,9 @@ const sql = require('../ArticleSql');
  */
 exports.getAllTags = async () => {
     try {
-        const [rows] = await pool.query(sql.GetAllTagsSQL);
-        return rows;
+        const db = await connectToDatabase();
+        const tags = await db.collection('Tags').find().toArray();
+        return tags;
     } catch (error) {
         throw new Error('Erreur lors de la récupération des tags: ' + error.message);
     }
@@ -19,13 +17,14 @@ exports.getAllTags = async () => {
 
 /**
  * Récupère un tag par son ID.
- * @param {number} id - ID du tag.
+ * @param {ObjectId} id - ID du tag.
  * @returns {Promise<Object|null>} Tag trouvé ou null si non trouvé.
  */
 exports.getTagById = async (id) => {
     try {
-        const [rows] = await pool.query(sql.GetTagByIdSQL, [id]);
-        return rows[0] || null;
+        const db = await connectToDatabase();
+        const tag = await db.collection('Tags').findOne({ _id: new ObjectId(id) });
+        return tag || null;
     } catch (error) {
         throw new Error('Erreur lors de la récupération du tag: ' + error.message);
     }
@@ -38,8 +37,9 @@ exports.getTagById = async (id) => {
  */
 exports.createTag = async (name) => {
     try {
-        const [result] = await pool.query(sql.CreateTagSQL, [name]);
-        return { tag_id: result.insertId, name };
+        const db = await connectToDatabase();
+        const result = await db.collection('Tags').insertOne({ name });
+        return { tag_id: result.insertedId, name };
     } catch (error) {
         throw new Error('Erreur lors de la création du tag: ' + error.message);
     }
@@ -47,13 +47,17 @@ exports.createTag = async (name) => {
 
 /**
  * Met à jour un tag existant.
- * @param {number} id - ID du tag à mettre à jour.
+ * @param {ObjectId} id - ID du tag à mettre à jour.
  * @param {string} name - Nouveau nom du tag.
  * @returns {Promise<void>}
  */
 exports.updateTag = async (id, name) => {
     try {
-        await pool.query(sql.UpdateTagSQL, [name, id]);
+        const db = await connectToDatabase();
+        await db.collection('Tags').updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { name } }
+        );
     } catch (error) {
         throw new Error('Erreur lors de la mise à jour du tag: ' + error.message);
     }
@@ -61,12 +65,13 @@ exports.updateTag = async (id, name) => {
 
 /**
  * Supprime un tag par son ID.
- * @param {number} id - ID du tag à supprimer.
+ * @param {ObjectId} id - ID du tag à supprimer.
  * @returns {Promise<void>}
  */
 exports.deleteTag = async (id) => {
     try {
-        await pool.query(sql.DeleteTagSQL, [id]);
+        const db = await connectToDatabase();
+        await db.collection('Tags').deleteOne({ _id: new ObjectId(id) });
     } catch (error) {
         throw new Error('Erreur lors de la suppression du tag: ' + error.message);
     }

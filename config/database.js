@@ -1,15 +1,28 @@
-//  /back_articles/config/database.js
+const { MongoClient } = require('mongodb');
+const dotenv = require('dotenv');
 
-const mysql = require('mysql2/promise');
-const dotenv = require('dotenv')
 dotenv.config();
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST_DEV,
-    user: process.env.DB_USER_DEV,
-    password: process.env.DB_PASSWORD_DEV,
-    database: process.env.DB_NAME_DEV
-});
+// Créer une URI de connexion MongoDB
+const uri = process.env.MONGODB_URI;
 
+// Créer un nouveau client MongoDB
+const client = new MongoClient(uri);
 
-module.exports = pool;
+async function connectToDatabase() {
+  try {
+    // Se connecter au client
+    await client.connect();
+    console.log('Connected to MongoDB');
+
+    // Sélectionner la base de données
+    const db = client.db(process.env.DB_NAME_PROD);
+    
+    // Retourner l'objet de la base de données
+    return db;
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+
+module.exports = connectToDatabase;

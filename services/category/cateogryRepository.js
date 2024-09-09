@@ -1,6 +1,5 @@
-// /src/services/categoryRepository.js
-const pool = require('../../config/database')
-const sql = require('../ArticleSql')
+const connectToDatabase = require('../../config/database');
+const { ObjectId } = require('mongodb');
 
 /**
  * Récupère toutes les catégories.
@@ -8,8 +7,9 @@ const sql = require('../ArticleSql')
  */
 exports.getAllCategories = async () => {
     try {
-        const [rows] = await pool.query(sql.GetAllCategoriesSQL);
-        return rows;
+        const db = await connectToDatabase();
+        const categories = await db.collection('Categories').find().toArray();
+        return categories;
     } catch (error) {
         throw new Error('Erreur lors de la récupération des catégories: ' + error.message);
     }
@@ -17,13 +17,14 @@ exports.getAllCategories = async () => {
 
 /**
  * Récupère une catégorie par son ID.
- * @param {number} id - ID de la catégorie.
+ * @param {ObjectId} id - ID de la catégorie.
  * @returns {Promise<Object|null>} Catégorie trouvée ou null si non trouvée.
  */
 exports.getCategoryById = async (id) => {
     try {
-        const [rows] = await pool.query(sql.GetCategoryByIdSQL, [id]);
-        return rows[0] || null;
+        const db = await connectToDatabase();
+        const category = await db.collection('Categories').findOne({ _id: new ObjectId(id) });
+        return category || null;
     } catch (error) {
         throw new Error('Erreur lors de la récupération de la catégorie: ' + error.message);
     }
@@ -36,8 +37,9 @@ exports.getCategoryById = async (id) => {
  */
 exports.createCategory = async (name) => {
     try {
-        const [result] = await pool.query(sql.CreateCategorySQL, [name]);
-        return { category_id: result.insertId, name };
+        const db = await connectToDatabase();
+        const result = await db.collection('Categories').insertOne({ name });
+        return { category_id: result.insertedId, name };
     } catch (error) {
         throw new Error('Erreur lors de la création de la catégorie: ' + error.message);
     }
@@ -45,13 +47,17 @@ exports.createCategory = async (name) => {
 
 /**
  * Met à jour une catégorie existante.
- * @param {number} id - ID de la catégorie à mettre à jour.
+ * @param {ObjectId} id - ID de la catégorie à mettre à jour.
  * @param {string} name - Nouveau nom de la catégorie.
  * @returns {Promise<void>}
  */
 exports.updateCategory = async (id, name) => {
     try {
-        await pool.query(sql.UpdateCategorySQL, [name, id]);
+        const db = await connectToDatabase();
+        await db.collection('Categories').updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { name } }
+        );
     } catch (error) {
         throw new Error('Erreur lors de la mise à jour de la catégorie: ' + error.message);
     }
@@ -59,12 +65,13 @@ exports.updateCategory = async (id, name) => {
 
 /**
  * Supprime une catégorie par son ID.
- * @param {number} id - ID de la catégorie à supprimer.
+ * @param {ObjectId} id - ID de la catégorie à supprimer.
  * @returns {Promise<void>}
  */
 exports.deleteCategory = async (id) => {
     try {
-        await pool.query(sql.DeleteCategorySQL, [id]);
+        const db = await connectToDatabase();
+        await db.collection('Categories').deleteOne({ _id: new ObjectId(id) });
     } catch (error) {
         throw new Error('Erreur lors de la suppression de la catégorie: ' + error.message);
     }

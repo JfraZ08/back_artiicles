@@ -1,4 +1,7 @@
+// src/controllers/articlesController.js
+
 const ArticleService = require('../services/articles/articleService')
+const { ObjectId } = require('mongodb')
 
 // Fonction pour obtenir les articles
 const getAllArticles = async (req,res) => {
@@ -13,7 +16,8 @@ const getAllArticles = async (req,res) => {
 // Fonction pour obtenir un article par son ID
 const getArticleById = async (req, res) => {
     try {
-      const article = await ArticleService.getById(id);
+      const { id } = req.params;
+      const article = await ArticleService.getArticleById(id);
       if (article) {
         res.status(200).json(article);
       } else {
@@ -68,6 +72,12 @@ const getArticleById = async (req, res) => {
   // Fonction pour supprimer un article
   const deleteArticle = async (req, res) => {
     const { id } = req.params;
+  
+    // Vérifiez que l'ID est un ObjectId valide
+    if (!ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID invalide' });
+    }
+  
     try {
       const deleted = await ArticleService.deleteArticle(id);
       if (deleted) {
