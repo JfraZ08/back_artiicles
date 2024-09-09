@@ -8,7 +8,6 @@ const getAllArticles = async () => {
     const articles = await db.collection('Articles').find().toArray();
     return articles;
   } catch (error) {
-    console.error('Erreur lors de la récupération des articles :', error.message);
     throw error;
   }
 };
@@ -20,7 +19,6 @@ const getArticleById = async (id) => {
     const article = await db.collection('Articles').findOne({ _id: new ObjectId(id) });
     return article;
   } catch (error) {
-    console.error('Erreur lors de la récupération de l\'article :', error.message);
     throw error;
   }
 };
@@ -32,7 +30,6 @@ const addArticle = async (title, content) => {
     const result = await db.collection('Articles').insertOne({ title, content });
     return result.insertedId;
   } catch (error) {
-    console.error('Erreur lors de l\'ajout de l\'article :', error.message);
     throw error;
   }
 };
@@ -47,7 +44,6 @@ const updateArticle = async (id, title, content) => {
     );
     return result.matchedCount > 0;
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de l\'article :', error.message);
     throw error;
   }
 };
@@ -64,7 +60,6 @@ const deleteArticle = async (id) => {
     
     return result.deletedCount > 0;
   } catch (error) {
-    console.error('Erreur lors de la suppression de l\'article :', error.message);
     throw error;
   }
 };

@@ -24,7 +24,6 @@ const getArticleById = async (req, res) => {
         res.status(404).json({ message: 'Article non trouvé' });
       }
     } catch (error) {
-      console.error('Erreur lors de la récupération de l\'article', error)
       res.status(500).json({ message: 'Erreur serveur'});
     }
   };
@@ -41,7 +40,6 @@ const getArticleById = async (req, res) => {
       const newArticleId = await ArticleService.addArticle(title,content);
       res.status(201).json({id: newArticleId, title, content});
     } catch (error) {
-      console.error('Erreur lors de la création de l\'article :', error)
       res.status(500).json({ message: 'Erreur serveur', error });
     }
   };
@@ -63,7 +61,6 @@ const getArticleById = async (req, res) => {
         res.status(404).json({ message: 'Article non trouvé' });
       }
     } catch (error) {
-      console.error('Erreur lors de la mise à jour de l\'article :', error.message);
       res.status(500).json({ message: 'Erreur serveur' });
     }
   };
@@ -86,7 +83,6 @@ const getArticleById = async (req, res) => {
         res.status(404).json({ message: 'Article non trouvé' });
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression de l\'article :', error.message);
       res.status(500).json({ message: 'Erreur serveur' });
     }
   };
