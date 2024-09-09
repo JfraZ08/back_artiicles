@@ -1,5 +1,5 @@
 // /src/controllers/tagController.js
-const TagRepository = require('../services/tag/tagRepository');
+const TagRepository = require('../services/tag/tagService');
 
 exports.getAllTags = async (req, res) => {
     try {

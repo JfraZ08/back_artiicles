@@ -1,5 +1,5 @@
 // /src/controllers/categoryController.js
-const CategoryRepository = require('../services/category/cateogryRepository');
+const CategoryRepository = require('../services/category/categoryService');
 
 exports.getAllCategories = async (req, res) => {
   try {
